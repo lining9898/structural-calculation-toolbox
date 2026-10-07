@@ -40,3 +40,7 @@
 本地规范 PDF 可内嵌定位文件页序；浏览器检查确认真实文件响应类型及目标页码链接，不声称验证了各浏览器 PDF 阅读器内部滚动。外部通用规范原页仍可能受站点访问限制。
 
 原始规范 PDF 未公开、未入 Git；本地构建目录可能含原文，不得直接公开部署。离线单文件预览可审阅计算页面，PDF 原文请使用本地服务版。
+
+## 在线页面交付
+
+增加 scripts/build-preview.mjs、package.json 的 build:preview 命令及 docs/index.html、docs/assets、docs/.nojekyll。仅生成可独立发布的网页，不复制 dist 中的 PDF，不改变任何公式或计算结果。生产构建通过；原有 46 项测试此前通过，核心代码未修改。当前 GitHub 连接对开通 Pages 返回 403 Resource not accessible by integration，在线地址尚未启用；需要仓库所有者设置来源为 module/beam-flexure 的 /docs。

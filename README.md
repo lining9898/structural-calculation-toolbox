@@ -44,3 +44,7 @@ npm test
 - `master`：人工验收后的稳定版本；未获验收不得合入。
 
 空仓库的首次提交仅为此项目说明，默认 `main` 暂作初始化基点；应用代码只在开发分支提交。
+
+## 在线人工验收预览
+
+运行 `npm run build:preview` 生成 docs/index.html 与 docs/assets；发布仅使用此目录，不包含原始 PDF。GitHub Pages 的来源为 module/beam-flexure 分支的 /docs 目录。页面明确标记为待人工验收预览。当前连接缺少开通 Pages 的权限，需要仓库所有者首次开启。

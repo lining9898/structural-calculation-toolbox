@@ -1,0 +1,15 @@
+import { cp, mkdir, readFile, readdir, rm, writeFile } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+const root=fileURLToPath(new URL('../',import.meta.url));
+const destination=path.join(root,'docs');
+await mkdir(destination,{recursive:true});
+await rm(path.join(destination,'assets'),{recursive:true,force:true});
+await cp(path.join(root,'dist/assets'),path.join(destination,'assets'),{recursive:true});
+let html=await readFile(path.join(root,'dist/index.html'),'utf8');
+html=html.replace('<body>','<body><p style="margin:12px 24px;font:14px system-ui;color:#526678">在线人工验收预览：当前提供正截面受弯计算，受剪尚未开发。规范 PDF 原文暂仅在本地版本查看。</p>');
+await writeFile(path.join(destination,'index.html'),html);
+await writeFile(path.join(destination,'.nojekyll'),'');
+const published=await readdir(path.join(destination,'assets'));
+if(published.some(name=>name.endsWith('.pdf')))throw new Error('发布文件禁止包含原始 PDF');
+console.log('在线预览产物已生成：仅网页与 assets，不复制规范 PDF。');
