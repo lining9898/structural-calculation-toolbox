@@ -1,0 +1,19 @@
+{
+  "name": "structural-calculation-toolbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "结构计算工具箱：梁截面验算",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "preview": "vite preview --host 0.0.0.0"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  },
+  "engines": { "node": ">=22.12.0" }
+}
