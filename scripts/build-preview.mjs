@@ -7,7 +7,6 @@ await mkdir(destination,{recursive:true});
 await rm(path.join(destination,'assets'),{recursive:true,force:true});
 await cp(path.join(root,'dist/assets'),path.join(destination,'assets'),{recursive:true});
 let html=await readFile(path.join(root,'dist/index.html'),'utf8');
-html=html.replace('<body>','<body><p style="margin:12px 24px;font:14px system-ui;color:#526678">在线人工验收预览：当前提供正截面受弯计算，受剪尚未开发。规范 PDF 原文暂仅在本地版本查看。</p>');
 await writeFile(path.join(destination,'index.html'),html);
 await writeFile(path.join(destination,'.nojekyll'),'');
 const published=await readdir(path.join(destination,'assets'));

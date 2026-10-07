@@ -1,7 +1,4 @@
 import './styles.css';
-import { mountBeamFlexure } from './modules/beam-flexure/page';
-
+import { mountHome } from './home/page';
 const app = document.querySelector<HTMLDivElement>('#app');
-if (app) {
-  mountBeamFlexure(app);
-}
+if (app) mountHome(app);
