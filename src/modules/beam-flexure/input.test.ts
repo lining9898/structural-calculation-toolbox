@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { assessInput } from './assess';
+import { calculateBeamFlexure } from './calculate';
 import { references } from './references';
 import type { RawInput } from './types';
 import { validateInput } from './validate';
 
-const valid: RawInput = { b: '250', h: '500', a_s: '40', A_s: '1256', M_d: '150', concrete: 'C30', steel: 'HRB400', tensionEdge: 'bottom', source: '人工填写的外部设计组合', singleReinforced: true, nonPrestressed: true, noSeismicCheck: true };
+const valid: RawInput = { b: '250', h: '500', a_s: '40', A_s: '1256', M_d: '150', concrete: 'C30', steel: 'HRB400', tensionEdge: 'bottom', source: '人工填写的外部设计组合', singleReinforced: true, nonPrestressed: true, noSeismicCheck: true, ordinaryStatic: true, notDeepBeam: true, demandIncludesImportance: true, beamType: 'ordinary' };
 
 describe('受弯模块输入检查（不代表规范验算）', () => {
   it('读取正常输入，不擅自生成材料强度', () => {
@@ -30,9 +30,9 @@ describe('受弯模块输入检查（不代表规范验算）', () => {
     if (!result.ok) expect(result.errors.a_s).toContain('必须小于梁高');
   });
   it('正有效高度的几何边界可通过输入检查，但不能成为承载力合格结论', () => {
-    const result = assessInput({ ...valid, a_s: '499.999' });
-    expect(result.status).toBe('pending-references');
-    if (result.status === 'pending-references') expect(result.effectiveHeight).toBeCloseTo(0.001, 10);
+    const result = calculateBeamFlexure({ ...valid, a_s: '499.999' });
+    expect(result.status).toBe('outside-model');
+    if (result.status === 'outside-model') expect(result.intermediate.h0).toBeCloseTo(0.001, 10);
   });
   it('弯矩换算溢出时拒绝，返回普通中文提示', () => {
     const result = validateInput({ ...valid, M_d: '1e308' });
@@ -49,28 +49,18 @@ describe('受弯模块输入检查（不代表规范验算）', () => {
   });
 });
 
-describe('关键依据缺失时阻止承载力输出', () => {
-  it('只返回已知几何关系、缺失依据；不返回承载力或合格判断', () => {
-    const result = assessInput(valid);
-    expect(result.status).toBe('pending-references');
-    if (result.status === 'pending-references') {
-      expect(result.effectiveHeight).toBe(460);
-      expect(result.missing).toEqual(expect.arrayContaining(['materials', 'capacity', 'demand', 'minimum-steel']));
-    }
-    expect(result).not.toHaveProperty('capacity');
-    expect(result).not.toHaveProperty('M_R');
-    expect(result).not.toHaveProperty('passed');
-  });
-  it('非法输入不能获得几何结果', () => {
-    const result = assessInput({ ...valid, b: '-1' });
+describe('规范映射与非法输入隔离', () => {
+  it('非法输入不能获得中间结果或承载力', () => {
+    const result = calculateBeamFlexure({ ...valid, b: '-1' });
     expect(result.status).toBe('invalid');
-    expect(result).not.toHaveProperty('effectiveHeight');
+    expect(result).not.toHaveProperty('intermediate');
+    expect(result).not.toHaveProperty('capacityKNm');
   });
-  it('原文页序绑定实际条表，不为其他未核对内容虚构定位', () => {
+  it('原文页序绑定已确认的条表', () => {
     const minimum = references.find(reference => reference.id === 'minimum-steel')!;
     expect(minimum.filePage).toBe(13);
-    expect(minimum.printedPage).toBe('10');
-    expect(minimum.status).toBe('pending');
-    expect(references.filter(reference => reference.pdfUrl).map(reference => reference.id)).toEqual(['minimum-steel']);
+    expect(minimum.printedPage).toBe('10—11');
+    expect(minimum.status).toBe('confirmed');
+    expect(references.every(reference => reference.pdfUrl && reference.filePage)).toBe(true);
   });
 });
