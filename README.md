@@ -21,7 +21,7 @@ npm test
 
 Node.js >=22.12。build:preview 只将网页和 assets 写入 docs；GitHub Pages 从 module/beam-flexure 分支的 /docs 发布。该分支暂保留原名作为既有预览来源，未合入 dev 或稳定分支。
 
-当前38项AAC板身风作用测试与7项公共单位测试通过。AAC预览仅支持限定板身风作用，抗震、连接、吊装及完整构造尚未完成，不代表整个模块完成。详见docs/aac-wall-panel-development-report.md。
+当前47项AAC板身风作用测试与7项公共单位测试通过。AAC预览仅支持限定板身风作用，抗震、连接、吊装及完整构造尚未完成，不代表整个模块完成。详见docs/aac-wall-panel-development-report.md。
 
 ## 规范与计算约束
 
@@ -31,4 +31,4 @@ Node.js >=22.12。build:preview 只将网页和 assets 写入 docs；GitHub Page
 
 ## AAC开发预览
 
-板身按JGJ/T17；抗震相关验算拟参照CECS553，当前抗震正式计算仍待规范协调与节点确认。源代码独立保留在module/aac-wall-panel。原始PDF仍仅本地使用，在线只发布网页产物。
+当前页面为单控制方向：受拉钢筋输入牌号、直径及根数；风荷载按GB50009-2012围护结构参数手动输入并展示乘算。板身按JGJ/T17；抗震相关验算拟参照CECS553，当前抗震正式计算仍待规范协调与节点确认。源代码独立保留在module/aac-wall-panel。原始PDF仍仅本地使用，在线只发布网页产物。
