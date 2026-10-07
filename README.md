@@ -31,7 +31,7 @@ npm test
 - 尚未开展结构承载力标准算例、规范限值算例或人工验收；这些需要先确认规范、公式和手算预期值。
 - 原文入口引用住建部官方 GB 55008 PDF，未把规范 PDF 分发到公开仓库。内嵌或页码定位失败时可回到官方发布页；页面不保证外站永远可用。
 
-详细核对见 [PRE-CALC CHECK](docs/beam-flexure-pre-calc-check.md)。
+详细核对见 [PRE-CALC CHECK 第二版](docs/beam-flexure-pre-calc-check-v2.md)。核心公式原文已读取，模型与输入口径待工程确认；当前应用仍不计算承载力。
 
 ## 分支约定
 
