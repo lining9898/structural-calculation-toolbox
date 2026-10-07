@@ -76,7 +76,7 @@ summary { cursor: pointer; padding: 15px 22px; font-size: 13px; font-weight: 550
 .process-body .formula { color: #263748; font-family: Georgia, serif; font-size: 21px; }
 .pending-note { color: #86642e; }
 .table-scroll { overflow-x: auto; }
-table { border-collapse: collapse; width: 100%; font-size: 12px; }
+table { border-collapse: collapse; width: 100%; min-width: 850px; font-size: 12px; }
 thead { background: #f7f9fa; color: #607487; }
 th, td { text-align: left; vertical-align: top; padding: 14px 20px; border-bottom: 1px solid #e5eaee; }
 th { font-weight: 550; }
