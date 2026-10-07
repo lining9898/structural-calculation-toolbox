@@ -1,4 +1,41 @@
+const windPdf =
+  "https://upload.wikimedia.org/wikipedia/commons/5/51/GB_50009-2012_%E5%BB%BA%E7%AD%91%E7%BB%93%E6%9E%84%E8%8D%B7%E8%BD%BD%E8%A7%84%E8%8C%83.pdf";
 export const references = {
+  wind: {
+    name: "GB 50009-2012 · 第8.1.1-2、8.1.2条",
+    page: 41,
+    printed: "30",
+    pdf: windPdf,
+    note: "已核对原版扫描：围护结构采用阵风系数与局部体型系数；基本风压不小于0.3 kN/m²。公开扫描来源为Wikimedia Commons。",
+  },
+  windHeight: {
+    name: "GB 50009-2012 · 第8.2.1条 / 表8.2.1",
+    page: 42,
+    printed: "31",
+    pdf: windPdf,
+    note: "粗糙度与高度为取值记录；μz由工程师查表输入，本版不自动插值。B类10m对应1.00。",
+  },
+  windGust: {
+    name: "GB 50009-2012 · 第8.6.1条 / 表8.6.1",
+    page: 73,
+    printed: "62–63",
+    pdf: windPdf,
+    note: "围护结构阵风系数βgz由工程师查表输入；B类10m对应1.70。",
+  },
+  windLocal: {
+    name: "GB 50009-2012 · 第8.3.3、8.3.4条",
+    page: 65,
+    printed: "54–56",
+    pdf: windPdf,
+    note: "须按板所在部位及适用的从属面积条件核对局部体型系数；本版不自动选取或折减。",
+  },
+  windInternal: {
+    name: "GB 50009-2012 · 第8.3.5条",
+    page: 67,
+    printed: "56–57",
+    pdf: windPdf,
+    note: "净局部体型系数须考虑建筑物内部压力及控制方向；输入绝对值，不能直接以整体体型系数替代。",
+  },
   materials: {
     name: "JGJ/T 17-2020 · 第3.2.2、3.2.3条及表",
     page: 14,

@@ -1,6 +1,7 @@
 import { calculate } from "./calculate";
 import { references } from "./references";
 import type { ReferenceId } from "./references";
+import { numericFields } from "./types";
 import type { RawInput, Step } from "./types";
 import { formatNumber as f } from "../../shared/units";
 const escape = (s: string) =>
@@ -28,23 +29,23 @@ const process = (steps: Step[]) =>
     )
     .join("");
 export function mountAAC(app: HTMLElement): void {
-  app.innerHTML = `<header class="aac-header"><a href="#">← 工具箱首页</a><span>装配式结构 / 蒸压加气混凝土外墙板</span><small>开发验收版</small></header><main class="aac-main"><div class="aac-title"><p class="eyebrow">AUTOCLAVED AERATED CONCRETE</p><h1>蒸压加气混凝土外墙板</h1><p>板身按 JGJ/T 17；抗震相关验算参照 T/CECS 553。</p></div><div class="notice"><span class="notice-mark">i</span><p>本版提供正、负风压下的板身受弯、受剪、抗裂及挠度检查。抗震、连接、位移适应和吊装尚未完成，不能给出外墙系统整体合格结论。</p></div>
- <div class="aac-workspace"><section class="aac-panel"><h2>板与受力示意</h2><svg class="aac-diagram" viewBox="0 0 300 290" role="img" aria-label="两端简支外墙板在均布面外风作用下的示意"><defs><marker id="wind-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#42738e"/></marker></defs><rect x="120" y="42" width="32" height="205" fill="#edf3f7" stroke="#597b90" stroke-width="2"/><path d="M120 42l-13 14h26zM120 247l-13 14h26z" fill="none" stroke="#597b90"/><path d="M60 75h50M60 115h50M60 155h50M60 195h50M60 235h50" stroke="#42738e" marker-end="url(#wind-arrow)"/><path d="M180 42h15M180 247h15M188 42v205" stroke="#a3b1bb"/><text x="201" y="150" fill="#597b90" font-size="12">l₀</text><text x="38" y="27" fill="#597b90" font-size="12">均布净风压 · 一向两端简支</text><text x="50" y="280" fill="#7b8f9b" font-size="11">板面、支点与钢筋位置以实际构造为准</text></svg><p class="aac-note">正风压：本页下侧受拉。<br>负风压：本页上侧受拉。<br>应与安装后的实际内外板面逐项对应。</p><div class="aac-pending"><h3>抗震与连接</h3><p>【待确认】现行地震系数及组合、具体支承连接、层间位移适应能力。</p><p>此部分未计算，不会自动显示“满足”。</p>${refButtons(["seismic", "connection", "exterior"])}</div></section>
- <section class="aac-panel"><div class="aac-panel-heading"><h2>计算参数</h2><button type="button" id="aac-example" class="aac-secondary">填入测试示例</button></div><form id="aac-form" novalidate>
+  app.innerHTML = `<header class="aac-header"><a href="#">← 工具箱首页</a><span>装配式结构 / 蒸压加气混凝土外墙板</span><small>开发验收版</small></header><main class="aac-main"><div class="aac-title"><p class="eyebrow">AUTOCLAVED AERATED CONCRETE</p><h1>蒸压加气混凝土外墙板</h1><p>板身按 JGJ/T 17；抗震相关验算参照 T/CECS 553。</p></div><div class="notice"><span class="notice-mark">i</span><p>本版验算工程师选择的一个控制方向：板身受弯、受剪、抗裂及挠度。抗震、连接、位移适应和吊装尚未完成，不能给出外墙系统整体合格结论。</p></div>
+ <div class="aac-workspace"><section class="aac-panel"><h2>板与受力示意</h2><svg class="aac-diagram" viewBox="0 0 300 290" role="img" aria-label="两端简支外墙板在均布面外风作用下的示意"><defs><marker id="wind-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="#42738e"/></marker></defs><rect x="120" y="42" width="32" height="205" fill="#edf3f7" stroke="#597b90" stroke-width="2"/><path d="M120 42l-13 14h26zM120 247l-13 14h26z" fill="none" stroke="#597b90"/><path d="M60 75h50M60 115h50M60 155h50M60 195h50M60 235h50" stroke="#42738e" marker-end="url(#wind-arrow)"/><path d="M180 42h15M180 247h15M188 42v205" stroke="#a3b1bb"/><text x="201" y="150" fill="#597b90" font-size="12">l₀</text><text x="38" y="27" fill="#597b90" font-size="12">均布净风压 · 一向两端简支</text><text x="50" y="280" fill="#7b8f9b" font-size="11">板面、支点与钢筋位置以实际构造为准</text></svg><p class="aac-note">工程师选择风压较大的一面，输入该受拉面的配筋。<br>竖向板自重沿面内，不加入本页面外均布荷载。<br>本页不计算自重引起的轴力及连接作用。</p><div class="aac-pending"><h3>抗震与连接</h3><p>【待确认】现行地震系数及组合、具体支承连接、层间位移适应能力。</p><p>此部分未计算，不会自动显示“满足”。</p>${refButtons(["seismic", "connection", "exterior"])}</div></section>
+ <section class="aac-panel"><div class="aac-panel-heading"><h2>计算参数</h2><button type="button" id="aac-example" class="aac-secondary">填入参考示例</button></div><form id="aac-form" novalidate>
  <fieldset><legend>板与计算跨度</legend><div class="aac-grid">${field("b", "整块板计算宽度 b", "mm")}${field("h", "板厚 h", "mm")}${field("span", "计算跨度 l₀", "mm", "两端简支计算跨度，不能直接用板总长代替。")}</div></fieldset>
- <fieldset><legend>材料与实际配筋</legend><div class="aac-grid"><label class="aac-field"><span>强度级别</span><select name="concrete"><option value="A3.5">A3.5 配筋板</option><option value="A5.0">A5.0 配筋板</option></select><span class="aac-error" id="concrete-error"></span></label><label class="aac-field"><span>材料品种</span><select name="product"><option value="sand">砂制品</option><option value="flyash">粉煤灰制品</option></select><span class="aac-error" id="product-error"></span></label><label class="aac-field"><span>钢筋牌号</span><select name="steel"><option>HPB300</option><option>HRB400</option><option>CRB600H</option></select><span class="aac-error" id="steel-error"></span></label>${field("steelBottom", "下侧受拉钢筋面积 As", "mm²")}${field("aBottom", "下侧合力点距板面 a_s", "mm", "不是净保护层厚度。")}${field("steelTop", "上侧受拉钢筋面积 As", "mm²")}${field("aTop", "上侧合力点距板面 a_s", "mm", "不计另一侧受压筋的有利贡献。")}</div></fieldset>
- <fieldset><legend>净风压与作用口径</legend><p class="aac-note">均输入绝对值；未启用的方向，两项同时填0。净风压应包含实际内外压作用；设计值已按所需组合及重要性因素处理，程序不重复乘系数。</p><div class="aac-grid">${field("positiveK", "正风压标准组合值 p_k", "kN/m²")}${field("positiveD", "正风压设计值 p_d", "kN/m²")}${field("negativeK", "负风压标准组合绝对值 p_k", "kN/m²")}${field("negativeD", "负风压设计绝对值 p_d", "kN/m²")}</div><label class="aac-field"><span>风压、组合、方向与跨度模型来源</span><textarea name="source" rows="2" placeholder="说明净风压取值、设计组合与γ₀处理，以及实际支承模型"></textarea><span class="aac-error" id="source-error"></span></label></fieldset>
- <fieldset><legend>换算截面与长期作用</legend><p class="aac-note">来自同一未开裂换算截面的 I₀ 与两侧 W₀。可依据厂家资料或经工程师复核的截面计算输入，不直接使用毛截面替代。</p><div class="aac-grid">${field("i0", "换算截面惯性矩 I₀", "mm⁴")}${field("wBottom", "下侧换算截面抵抗矩 W₀", "mm³")}${field("wTop", "上侧换算截面抵抗矩 W₀", "mm³")}${field("longFactor", "长期挠度增大系数 η_long", "无量纲", "按1+(Mq/Mk)(θ−1)确认；不默认取1。")}</div><label class="aac-field"><span>换算截面、长期系数与配筋来源</span><textarea name="sectionSource" rows="2" placeholder="填写配筋图、换算截面计算和长期系数依据"></textarea><span class="aac-error" id="sectionSource-error"></span></label></fieldset>
+ <fieldset><legend>材料与实际配筋</legend><div class="aac-grid"><label class="aac-field"><span>强度级别</span><select name="concrete"><option value="A3.5">A3.5 配筋板</option><option value="A5.0">A5.0 配筋板</option></select><span class="aac-error" id="concrete-error"></span></label><label class="aac-field"><span>材料品种</span><select name="product"><option value="sand">砂制品</option><option value="flyash">粉煤灰制品</option></select><span class="aac-error" id="product-error"></span></label><label class="aac-field"><span>钢筋牌号</span><select name="steel"><option>HPB300</option><option>HRB400</option><option>CRB600H</option></select><span class="aac-error" id="steel-error"></span></label>${field("diameter", "受拉钢筋直径 d", "mm")}${field("count", "受拉钢筋根数 n", "根", "只输入所选受拉面的钢筋，面积由程序计算。")}${field("a", "受拉合力点距板面 a_s", "mm", "不是净保护层厚度；本版不计受压筋有利贡献。")}</div><p class="aac-note">As = πd²n/4；计算时自动显示面积及配筋率。</p></fieldset>
+ <fieldset><legend>风荷载参数 · GB 50009-2012 围护结构</legend><p class="aac-note">仅计算一个控制方向。μz、βgz手动查表输入；粗糙度和高度用于记录取值条件，程序不自动生成系数。体型系数输入已考虑内外压不利组合的净局部体型系数绝对值。</p><div class="aac-grid">${field("basicWind", "基本风压 w₀", "kN/m²", "不小于0.30；按项目地点、重现期及适用要求确认。")}<label class="aac-field"><span>地面粗糙度类别</span><select name="terrain"><option>A</option><option selected>B</option><option>C</option><option>D</option></select><span class="aac-error" id="terrain-error"></span></label>${field("height", "计算高度 z", "m")}${field("muZ", "风压高度变化系数 μz", "无量纲", "查表8.2.1输入。")} ${field("gust", "阵风系数 βgz", "无量纲", "围护结构查表8.6.1；不是主体风振系数βz。")} ${field("local", "控制净局部体型系数 |μsl,net|", "无量纲", "已考虑墙面部位、内外压及适用的面积条件。")} ${field("gammaW", "风荷载分项系数 γW", "无量纲", "按现行组合确认；不从2012旧版系数自动取值。")} ${field("gamma0", "板身重要性系数 γ₀", "无量纲", "用于γ₀M、γ₀V；不要再乘一次。")}</div><p class="aac-note">wk = βgz |μsl,net| μz w₀；设计需求按γ₀γW放大。仅单一风作用，未自动生成其他荷载组合。</p>${refButtons(["wind", "windHeight", "windGust", "windLocal", "windInternal"])}<label class="aac-field"><span>风荷载、控制板面与现行组合取值依据</span><textarea name="source" rows="2" placeholder="说明控制受拉面、系数查表条件、内外压处理、γW和γ₀现行依据及实际支承"></textarea><span class="aac-error" id="source-error"></span></label></fieldset>
+ <fieldset><legend>换算截面与长期作用</legend><p class="aac-note">输入同一未开裂换算截面的 I₀ 与所选受拉边缘 W₀。单侧配筋会改变换算截面中性轴，不能直接假定仍在板厚中心。可依据厂家资料或经工程师复核的截面计算输入，不直接使用毛截面替代。</p><div class="aac-grid">${field("i0", "换算截面惯性矩 I₀", "mm⁴")}${field("w", "受拉边缘换算截面抵抗矩 W₀", "mm³")}${field("longFactor", "长期挠度增大系数 η_long", "无量纲", "按1+(Mq/Mk)(θ−1)确认；不默认取1。")}</div><label class="aac-field"><span>换算截面、长期系数与配筋来源</span><textarea name="sectionSource" rows="2" placeholder="填写配筋图、换算截面计算和长期系数依据"></textarea><span class="aac-error" id="sectionSource-error"></span></label></fieldset>
  <fieldset class="aac-options"><legend>适用条件确认</legend>${[
    [
      "model",
-     "无洞口、非承重、一向两端简支、均布净风压；实际支承及构造符合此模型",
+     "竖向、无洞口、非承重、一向两端简支、均布净风压；实际构造符合此模型",
    ],
-   ["windBasis", "已确认正负风压方向、标准组合、设计值及重要性因素的输入口径"],
    [
-     "sectionBasis",
-     "换算截面和长期系数已由工程师核对，未以毛截面或短期刚度替代",
+     "windBasis",
+     "已确认控制板面、净局部体型系数、手动查表系数及现行γW、γ₀取值",
    ],
+   ["sectionBasis", "换算截面及长期系数已核对，I₀和W₀已考虑实际配筋中性轴"],
  ]
    .map(
      ([id, label]) =>
@@ -96,24 +97,11 @@ export function mountAAC(app: HTMLElement): void {
     const data = new FormData(form);
     return Object.fromEntries([
       ...[
-        "b",
-        "h",
-        "span",
-        "aBottom",
-        "aTop",
-        "steelBottom",
-        "steelTop",
+        ...Object.keys(numericFields),
         "concrete",
         "steel",
         "product",
-        "i0",
-        "wBottom",
-        "wTop",
-        "longFactor",
-        "positiveK",
-        "negativeK",
-        "positiveD",
-        "negativeD",
+        "terrain",
         "source",
         "sectionSource",
       ].map((key) => [key, String(data.get(key) ?? "")]),
@@ -138,14 +126,14 @@ export function mountAAC(app: HTMLElement): void {
       print.disabled = false;
       get("#aac-input-state").textContent =
         "板身风作用验算已完成；外墙系统整体结论尚未给出。";
-      results.innerHTML = `<div class="aac-result-banner ${result.passed ? "aac-pass" : "aac-fail"}">${result.passed ? "所输入风压工况的板身已检查项目满足" : "存在不满足或超出公式适用范围的项目"}<small>抗震、连接及其他未完成项：未验算</small></div><div class="aac-results-grid">${result.directions.map((d) => `<section><h3>${d.name} · ${d.edge}受拉</h3><div class="aac-key-result"><span>受弯承载力</span><strong>${d.momentCapacity === null ? "未输出" : f(d.momentCapacity)} <small>kN·m</small></strong><span>设计弯矩 ${f(d.momentDemand)} kN·m</span></div><dl><div><dt>受剪承载力 / 需求</dt><dd>${f(d.shearCapacity)} / ${f(d.shearDemand)} kN</dd></div><div><dt>抗裂边缘应力</dt><dd>${f(d.stress)} N/mm²</dd></div><div><dt>挠度 / 限值</dt><dd>${f(d.deflection)} / ${f(d.deflectionLimit)} mm</dd></div></dl><ul class="aac-checks">${d.checks.map((c) => `<li><div><b>${c.title}</b><p>${c.comparison}</p>${refButtons(c.references)}</div><span class="${c.passed ? "aac-pass" : "aac-fail"}">${c.passed ? "满足" : "不满足 / 不适用"}</span></li>`).join("")}</ul></section>`).join("")}</div>`;
+      results.innerHTML = `<div class="aac-result-banner ${result.passed ? "aac-pass" : "aac-fail"}">${result.passed ? "所选控制方向的板身已检查项目满足" : "存在不满足或超出公式适用范围的项目"}<small>抗震、连接及其他未完成项：未验算</small></div><div class="aac-results-grid" style="grid-template-columns:1fr">${[result.direction].map((d) => `<section><h3>${d.name} · ${d.edge}受拉</h3><div class="aac-key-result"><span>受弯承载力</span><strong>${d.momentCapacity === null ? "未输出" : f(d.momentCapacity)} <small>kN·m</small></strong><span>γ₀M需求 ${f(d.momentDemand)} kN·m</span></div><dl><div><dt>受拉钢筋面积 / 配筋率</dt><dd>${f(d.area)} mm² / ${f(d.reinforcementRatio)}%</dd></div><div><dt>风荷载标准值 wk</dt><dd>${f(d.windStandard)} kN/m²</dd></div><div><dt>标准弯矩 Mk</dt><dd>${f(d.standardMoment)} kN·m</dd></div><div><dt>受剪承载力 / γ₀V需求</dt><dd>${f(d.shearCapacity)} / ${f(d.shearDemand)} kN</dd></div><div><dt>抗裂边缘应力</dt><dd>${f(d.stress)} N/mm²</dd></div><div><dt>挠度 / 限值</dt><dd>${f(d.deflection)} / ${f(d.deflectionLimit)} mm</dd></div></dl><ul class="aac-checks">${d.checks.map((c) => `<li><div><b>${c.title}</b><p>${c.comparison}</p>${refButtons(c.references)}</div><span class="${c.passed ? "aac-pass" : "aac-fail"}">${c.passed ? "满足" : "不满足 / 不适用"}</span></li>`).join("")}</ul></section>`).join("")}</div>`;
       const source = document.createElement("p");
       source.className = "aac-note";
       source.textContent = `输入来源：${result.input.source}；截面及长期来源：${result.input.sectionSource}`;
       results.append(source);
       report.innerHTML =
         process(result.steps) +
-        result.directions
+        [result.direction]
           .map(
             (d) =>
               `<h3 class="aac-direction-title">${d.name} · ${d.edge}受拉</h3>${process(d.steps)}`,
@@ -197,27 +185,29 @@ export function mountAAC(app: HTMLElement): void {
     showErrors({});
     const example = {
       b: "600",
-      h: "150",
+      h: "200",
       span: "3000",
-      aBottom: "25",
-      aTop: "25",
-      steelBottom: "100",
-      steelTop: "100",
-      concrete: "A3.5",
-      steel: "HPB300",
+      a: "35",
+      diameter: "8",
+      count: "4",
+      concrete: "A5.0",
+      steel: "CRB600H",
       product: "sand",
-      i0: "225000000",
-      wBottom: "3000000",
-      wTop: "3000000",
-      longFactor: "1.5",
-      positiveK: "0.5",
-      negativeK: "0.8",
-      positiveD: "0.75",
-      negativeD: "1.2",
+      terrain: "B",
+      basicWind: "0.450",
+      height: "10",
+      muZ: "1.000",
+      gust: "1.700",
+      local: "1.20",
+      gammaW: "1.5",
+      gamma0: "1.0",
+      i0: "463826524.06275657",
+      w: "5051634.847206384",
+      longFactor: "1",
       source:
-        "页面测试假设：均布净风压与设计组合值，仅用于演示，不是已验收工程荷载。",
+        "参考演示：B类10m，μz=1，βgz=1.7；假定控制净局部体型系数1.2，γW=1.5、γ₀=1。上述工程适用性需人工确认。",
       sectionSource:
-        "页面测试假设：同一对称换算截面I₀=225000000mm⁴，W₀=3000000mm³；长期增大系数1.5，需人工复核。",
+        "参考截面仅作演示：单侧φ8×4，按Es/Ec=200000/2300、忽略钢筋自身惯性，换算中性轴距受压面108.1828877mm，I₀=463826524.06275657mm⁴、W₀=5051634.847206384mm³；风作用长期系数取1需核对。",
     };
     for (const [id, value] of Object.entries(example))
       form.querySelector<HTMLInputElement>(`[name="${id}"]`)!.value = value;
@@ -227,7 +217,7 @@ export function mountAAC(app: HTMLElement): void {
         el.checked = false;
       });
     get("#aac-input-state").textContent =
-      "已填入测试假设，适用条件未自动勾选。请核对后计算，不用于直接工程设计。";
+      "已填入参考演示，截面数据与工程适用性需人工核对；确认项未自动勾选。";
   });
   const dialog = get<HTMLDialogElement>("#aac-pdf"),
     frame = get<HTMLIFrameElement>("#aac-pdf-frame");
@@ -243,13 +233,22 @@ export function mountAAC(app: HTMLElement): void {
     frame.removeAttribute("src");
     get("#aac-pdf-title").textContent = ref.name;
     get("#aac-pdf-note").textContent =
-      `上传文件第${ref.page}页，印刷页${ref.printed}；${ref.note}`;
+      `PDF文件第${ref.page}页，印刷页${ref.printed}；${ref.note}`;
     const open = get<HTMLAnchorElement>("#aac-pdf-open");
     open.hidden = true;
     get("#aac-pdf-state").textContent = "正在检查本地原文…";
     dialog.showModal();
     const url = new URL(ref.pdf, document.baseURI);
     url.hash = `page=${ref.page}`;
+    if (url.origin !== location.origin) {
+      // Public original scan; private uploaded standards still use the local-only path below.
+      frame.src = url.href;
+      open.href = url.href;
+      open.hidden = false;
+      get("#aac-pdf-state").textContent =
+        "公开原版扫描按对应页打开；如网页内无法加载，可点击新窗口查看。";
+      return;
+    }
     try {
       const response = await fetch(new URL(ref.pdf, document.baseURI), {
         method: "HEAD",
