@@ -85,6 +85,20 @@ td small { display: block; margin-top: 5px; color: #738393; }
 td:last-child { min-width: 130px; }
 td a, td .muted { display: block; margin-top: 5px; }
 .status-pending { color: #86642e !important; }
+.status-pass { color: #286747 !important; }
+.status-fail { color: #b43e36 !important; }
+.input-status.success { color: #286747; background: #f1f8f3; border-color: #4c8966; }
+.empty-note, .precision-note { margin: 16px 22px; font-size: 12px; color: #617588; }
+.input-summary { margin: 0 22px 20px; font-size: 12px; color: #617588; overflow-wrap: anywhere; }
+.check-detail > div { min-width: 0; }
+.check-detail strong, .check-detail small { display: block; }
+.check-detail small { color: #617588; margin-top: 4px; }
+.check-detail .text-button { display: block; text-align: left; margin-top: 5px; line-height: 1.5; }
+.check-detail > span { flex-shrink: 0; }
+.step-references { display: grid; gap: 8px; margin-top: 12px; }
+.step-references .text-button { text-align: left; line-height: 1.6; }
+.process-body { overflow-wrap: anywhere; }
+.main-results .result-text { font-size: 15px; }
 .muted { color: #83919e; }
 .text-button { padding: 0; border: 0; background: none; color: #245c84; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
 footer { padding: 22px 0 8px; font-size: 11px; color: #718292; }

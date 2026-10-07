@@ -37,18 +37,25 @@ export function validateInput(raw: RawInput): Validation {
     catch { errors.M_d = '设计弯矩 M_d 超出可处理范围，请检查数值及单位。'; }
   }
   if (!concreteGrades.includes(raw.concrete as BeamInput['concrete'])) {
-    errors.concrete = '请选择本版拟支持的混凝土等级。';
+    errors.concrete = '请选择本版支持的混凝土等级。';
   }
   if (!steelGrades.includes(raw.steel as BeamInput['steel'])) {
-    errors.steel = '请选择本版拟支持的钢筋牌号。';
+    errors.steel = '请选择本版支持的钢筋牌号。';
   }
   if (raw.tensionEdge !== 'top' && raw.tensionEdge !== 'bottom') {
     errors.tensionEdge = '请选择当前截面的受拉边。';
   }
+  if (raw.beamType !== 'ordinary' && raw.beamType !== 'frame') errors.beamType = '请选择普通梁或框架梁。';
+  if (raw.concrete === 'C25' && raw.steel === 'HRB500') errors.concrete = '采用 HRB500 钢筋时，混凝土等级不得低于 C30。';
+  if (!errors.b && !errors.h && !Number.isFinite(numbers.b * numbers.h)) errors.general = '截面尺寸超出可处理范围，请检查数值及单位。';
+  if (!errors.A_s && !errors.b && !errors.h && numbers.A_s >= numbers.b * numbers.h) errors.A_s = '受拉钢筋面积必须小于截面总面积，请检查数值及单位。';
   if (!raw.source.trim()) errors.source = '请填写设计弯矩来源及组合说明。';
-  if (!raw.singleReinforced) errors.singleReinforced = '当前模型仅拟用于单筋截面，请确认不计受压钢筋贡献。';
-  if (!raw.nonPrestressed) errors.nonPrestressed = '当前模型仅拟用于非预应力构件。';
+  if (!raw.singleReinforced) errors.singleReinforced = '当前模型仅用于单筋截面，请确认不计受压钢筋贡献。';
+  if (!raw.nonPrestressed) errors.nonPrestressed = '当前模型仅用于非预应力构件。';
   if (!raw.noSeismicCheck) errors.noSeismicCheck = '当前版本不支持抗震专项验算，不适用时请停止使用本模型。';
+  if (!raw.ordinaryStatic) errors.ordinaryStatic = '当前模型仅适用于普通静力、非疲劳，且抗力模型系数取 1.0 的情形。';
+  if (!raw.notDeepBeam) errors.notDeepBeam = '当前模型不适用于深受弯构件。';
+  if (!raw.demandIncludesImportance) errors.demandIncludesImportance = '请确认输入弯矩已包含结构重要性因素；程序不会重复乘入。';
   if (Object.keys(errors).length) return { ok: false, errors };
   return {
     ok: true,
@@ -58,6 +65,7 @@ export function validateInput(raw: RawInput): Validation {
       steel: raw.steel as BeamInput['steel'],
       tensionEdge: raw.tensionEdge as BeamInput['tensionEdge'],
       source: raw.source.trim(),
+      beamType: raw.beamType as BeamInput['beamType'],
     },
   };
 }
