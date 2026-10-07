@@ -8,12 +8,15 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc --noEmit && vite build",
     "test": "vitest run",
-    "preview": "vite preview --host 0.0.0.0"
+    "preview": "vite preview --host 0.0.0.0",
+    "build:preview": "npm run build && node scripts/build-preview.mjs"
   },
   "devDependencies": {
     "typescript": "7.0.2",
     "vite": "8.3.3",
     "vitest": "5.0.3"
   },
-  "engines": { "node": ">=22.12.0" }
+  "engines": {
+    "node": ">=22.12.0"
+  }
 }
