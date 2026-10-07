@@ -44,3 +44,7 @@
 ## 在线页面交付
 
 增加 scripts/build-preview.mjs、package.json 的 build:preview 命令及 docs/index.html、docs/assets、docs/.nojekyll。仅生成可独立发布的网页，不复制 dist 中的 PDF，不改变任何公式或计算结果。生产构建通过；原有 46 项测试此前通过，核心代码未修改。当前 GitHub 连接对开通 Pages 返回 403 Resource not accessible by integration，在线地址尚未启用；需要仓库所有者设置来源为 module/beam-flexure 的 /docs。
+
+## 理正 7.0 操作布局调整
+
+页面采用截面示意与参数左右布局，参数分为设计信息、配筋信息；计算书支持全部展开、折叠及打印，打印前自动展开并在结束后恢复。标签支持键盘切换，隐藏参数出现错误时自动显示所在分组。核心公式、材料和单位逻辑未改动；仍为实配受弯验算，未加入求配筋、自动选筋及受剪公式。公共修改为 src/styles.css 的布局和打印样式，影响当前受弯页面；Build 与 46 项测试通过，无其他已实现模块。用户提供的理正算例和截图未发布到公开仓库。

@@ -111,3 +111,29 @@ dialog::backdrop { background: #20374f88; }
 iframe { display: block; width: 100%; height: 65vh; border: 0; background: #f4f6f8; }
 @media (max-width: 850px) { .workspace { grid-template-columns: 1fr; } .page-heading { align-items: flex-start; } .version-note { max-width: 130px; text-align: right; } .module-nav { gap: 16px; } .future-module small { display: block; margin: 0; } }
 @media (max-width: 480px) { .site-header { padding: 14px 16px; } .header-note { display: none; } main { padding: 0 16px; margin-top: 22px; } h1 { font-size: 24px; } .module-nav { font-size: 12px; } .panel-heading, form { padding-left: 16px; padding-right: 16px; } .field-grid { gap: 14px 12px; } .field label { font-size: 12px; } .field small { font-size: 10px; } .panel-heading > span { max-width: 140px; text-align: right; } .process-body { margin-left: 24px; margin-right: 16px; } .main-results { padding: 20px 16px; } }
+
+/* 梁截面工作区：设计信息、配筋信息与计算书。 */
+[hidden] { display: none !important; }
+.task-strip { display: flex; justify-content: space-between; gap: 14px; padding: 12px 16px; margin-bottom: 18px; border: 1px solid #cbd6df; background: #eef3f7; font-size: 12px; }
+.task-strip span { color: #617588; }
+.engineering-workspace { grid-template-columns: minmax(260px, .7fr) minmax(0, 1.3fr); gap: 18px; }
+.engineering-workspace .results-column { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; align-items: start; }
+.parameter-tabs { display: flex; margin: -4px 0 22px; border-bottom: 1px solid #cbd6df; gap: 5px; }
+.parameter-tabs button { padding: 10px 24px; border: 0; border-bottom: 3px solid transparent; color: #617588; background: #f4f6f8; font-size: 14px; }
+.parameter-tabs button[aria-selected="true"] { background: #fff; border-bottom-color: #245c84; color: #245c84; font-weight: 650; }
+.fixed-parameter { padding: 8px 12px; border: 1px solid #e5eaee; background: #f7f9fa; }
+.fixed-parameter > span { display: block; font-size: 12px; color: #617588; }
+.fixed-parameter strong { display: block; font-size: 14px; }
+.parameter-note { margin: 0 0 20px; font-size: 12px; color: #617588; }
+.reinforcement-note { background: #f4f7fa; padding: 14px; font-size: 12px; }
+.reinforcement-note p { margin-bottom: 0; color: #617588; }
+.diagram-demand { text-align: center; color: #245c84; font-size: 16px; font-weight: 600; margin: 0 0 12px; }
+.workflow-guide { border-top: 1px solid #e5eaee; padding: 18px 22px; font-size: 13px; }
+.workflow-guide ol { margin: 10px 0 0; padding-left: 22px; color: #617588; }
+.workflow-guide li { margin: 6px 0; }
+.report-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.report-actions button { padding: 6px 10px; font-size: 12px; }
+#results-area { scroll-margin-top: 16px; }
+@media (max-width: 850px) { .engineering-workspace { grid-template-columns: 1fr; } .engineering-workspace .results-column { grid-template-columns: 1fr; } .diagram-panel svg { height: 210px; } .workflow-guide { display: none; } .task-strip { flex-direction: column; gap: 4px; } }
+@media (max-width: 480px) { .form-actions { flex-wrap: wrap; gap: 8px; } .process-panel .panel-heading { align-items: flex-start; flex-direction: column; } .parameter-tabs button { flex: 1; padding-left: 12px; padding-right: 12px; } }
+@media print { :root { background: white; color: black; } .site-header, .module-nav, .scope-note, .task-strip, .input-panel, .diagram-panel, .report-actions, .reference-panel, dialog, .version-note { display: none !important; } main { max-width: none; margin: 0; padding: 0; } .engineering-workspace, .engineering-workspace .results-column { display: block; } .panel { border-radius: 0; margin: 12px 0; overflow: visible; } .process-body { font-size: 11px; } .process-body .formula { font-size: 16px; } .text-button { text-decoration: none; color: black; } .process-body, .check-detail { break-inside: avoid; } .precision-note { font-size: 10px; } }

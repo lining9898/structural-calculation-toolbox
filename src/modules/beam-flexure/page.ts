@@ -35,20 +35,25 @@ const scopeFields = [
 export function mountBeamFlexure(app: HTMLElement): void {
   app.innerHTML = `
     <header class="site-header"><div class="brand"><span class="brand-mark" aria-hidden="true">▥</span>结构计算工具箱</div><span class="header-note">确定性计算 · 过程可复核</span></header>
-    <main><div class="page-heading"><div><p class="eyebrow">混凝土结构 / 梁</p><h1>梁截面验算</h1></div><span class="version-note">受弯模块 · 等待工程师人工验收</span></div>
+    <main><div class="page-heading"><div><p class="eyebrow">混凝土结构 / 梁</p><h1>梁截面设计与验算</h1></div><span class="version-note">参考理正 7.0 操作布局 · 人工验收预览</span></div>
     <nav class="module-nav" aria-label="梁截面验算模块"><span class="current-module" aria-current="page">01 正截面受弯承载力计算</span><span class="future-module">02 斜截面受剪承载力计算 <small>后续独立开发</small></span></nav>
     <p class="scope-note">普通静力单筋矩形截面；非预应力、非深受弯构件，不含疲劳和抗震专项。仅验算本页面列出的项目。</p>
-    <div class="workspace"><section class="panel input-panel" aria-labelledby="input-heading"><div class="panel-heading"><h2 id="input-heading">参数输入</h2><span>长度单位 mm</span></div><form id="beam-form" novalidate>
-    <fieldset><legend>截面与配筋</legend><div class="field-grid">${numberField('b', '梁宽', 'b', 'mm')}${numberField('h', '梁高', 'h', 'mm')}${numberField('a_s', '钢筋合力点距离', 'a_s', 'mm', '至受拉边的距离，不是保护层厚度。')}${numberField('A_s', '实配受拉钢筋面积', 'A_s', 'mm²', '由工程师按实际配筋汇总。')}
-    <div class="field"><label for="beamType">梁类别</label><select id="beamType" name="beamType" aria-describedby="beamType-error"><option value="ordinary">普通梁</option><option value="frame">框架梁</option></select><small>框架梁另检查最小截面宽度。</small><p class="field-error" id="beamType-error"></p></div></div></fieldset>
-    <fieldset><legend>材料</legend><div class="field-grid">${selectField('concrete', '混凝土强度等级', concreteGrades, '按已确认材料表读取设计值。')}${selectField('steel', '受拉钢筋牌号', steelGrades, 'HRB500 配合不低于 C30 的混凝土。')}</div></fieldset>
-    <fieldset><legend>设计需求</legend><div class="field-grid">${numberField('M_d', '验算弯矩绝对值', 'M_d', 'kN·m', '必须已包含结构重要性因素 γ₀。')}<div class="field"><label for="tensionEdge">受拉边</label><select id="tensionEdge" name="tensionEdge" aria-describedby="tensionEdge-error"><option value="bottom">下边受拉</option><option value="top">上边受拉</option></select><small>配筋与合力点应对应此边。</small><p class="field-error" id="tensionEdge-error"></p></div></div><div class="field"><label for="source">弯矩来源、组合与因素处理说明</label><textarea id="source" name="source" rows="2" required placeholder="填写分析模型、组合，以及 γ₀ 已计入的位置" aria-describedby="source-error"></textarea><p class="field-error" id="source-error"></p></div></fieldset>
-    <fieldset class="scope-checks"><legend>模型与输入口径确认</legend>${scopeFields.map(([name, title]) => `<label><input name="${name}" type="checkbox" aria-describedby="${name}-error">${title}</label><p class="field-error" id="${name}-error"></p>`).join('')}</fieldset>
-    <p class="field-error" id="general-error" role="alert"></p><div class="form-actions"><button class="primary-button" type="submit">开始计算</button><button class="secondary-button" type="button" id="validate-button">检查输入</button></div><p class="calculation-lock">仅确认适用于当前构件的条件；不满足时应采用其他模型。</p></form></section>
-    <div class="results-column"><section class="panel diagram-panel" aria-labelledby="diagram-heading"><div class="panel-heading"><h2 id="diagram-heading">构件示意图</h2><span>矩形截面</span></div>${diagram}<p class="diagram-note">示意图不按比例；圆点不代表实际钢筋根数。</p></section>
+    <div class="task-strip"><strong>当前任务：已知实配钢筋，验算正截面受弯</strong><span>求所需配筋、选筋及受剪：规范核对后加入</span></div>
+    <div class="workspace engineering-workspace"><section class="panel diagram-panel" aria-labelledby="diagram-heading"><div class="panel-heading"><h2 id="diagram-heading">截面与内力示意</h2><span>普通矩形截面</span></div>${diagram}<p class="diagram-demand" id="diagram-demand">弯矩 M_d：尚未输入</p><p class="diagram-note">按当前受拉边表示配筋位置；圆点不代表实际根数。<br>保护层与钢筋合力点距离 a_s 分别处理。</p><div class="workflow-guide"><strong>验算顺序</strong><ol><li>填写设计信息</li><li>填写实际配筋与合力点</li><li>检查范围并开始计算</li><li>查看验算结果和计算书</li></ol></div></section>
+    <section class="panel input-panel" aria-labelledby="input-heading"><div class="panel-heading"><h2 id="input-heading">计算参数</h2><span>单位随参数显示</span></div><form id="beam-form" novalidate>
+    <div class="parameter-tabs" role="tablist" aria-label="计算参数分组"><button type="button" role="tab" id="design-tab" aria-controls="design-info" aria-selected="true" tabindex="0">设计信息</button><button type="button" role="tab" id="reinforcement-tab" aria-controls="reinforcement-info" aria-selected="false" tabindex="-1">配筋信息</button></div>
+    <div id="design-info" role="tabpanel" aria-labelledby="design-tab">
+    <fieldset><legend>构件与截面</legend><div class="field-grid">${numberField('b', '梁宽', 'b', 'mm')}${numberField('h', '梁高', 'h', 'mm')}<div class="field"><label for="beamType">构件类型</label><select id="beamType" name="beamType" aria-describedby="beamType-error"><option value="ordinary">普通梁</option><option value="frame">框架梁</option></select><small>框架梁另检查最小截面宽度。</small><p class="field-error" id="beamType-error"></p></div><div class="field fixed-parameter"><span>截面形式</span><strong>矩形 · 单筋</strong><small>不计受压钢筋贡献</small></div></div></fieldset>
+    <fieldset><legend>材料设计信息</legend><div class="field-grid">${selectField('concrete', '混凝土强度等级', concreteGrades, '按确认的材料表读取设计强度。')}${selectField('steel', '纵筋种类', steelGrades, 'HRB500 配合不低于 C30 的混凝土。')}</div></fieldset>
+    <fieldset><legend>设计内力</legend>${numberField('M_d', '弯矩设计值绝对值', 'M_d', 'kN·m', '输入值必须已包含结构重要性因素 γ₀。')}<div class="field"><label for="source">内力来源与组合说明</label><textarea id="source" name="source" rows="2" required placeholder="填写分析模型、组合，以及 γ₀ 已计入的位置" aria-describedby="source-error"></textarea><p class="field-error" id="source-error"></p></div></fieldset>
+    </div>
+    <div id="reinforcement-info" role="tabpanel" aria-labelledby="reinforcement-tab" hidden><p class="parameter-note">本次输入实际配筋面积进行验算。面积大于设计需求，不代表受压区及构造条件均满足。</p><fieldset><legend>实际受拉钢筋</legend><div class="field-grid">${numberField('A_s', '实配受拉钢筋面积', 'A_s', 'mm²', '按实际根数、直径和排数汇总。')}${numberField('a_s', '钢筋合力点距离', 'a_s', 'mm', '至受拉边的距离，不是保护层厚度。')}<div class="field"><label for="tensionEdge">受拉位置</label><select id="tensionEdge" name="tensionEdge" aria-describedby="tensionEdge-error"><option value="bottom">下边受拉</option><option value="top">上边受拉</option></select><small>实配面积与合力点对应此边。</small><p class="field-error" id="tensionEdge-error"></p></div></div></fieldset><div class="reinforcement-note"><strong>有效高度采用 h₀ = h − a_s</strong><p>选配钢筋后，应根据保护层、箍筋直径、纵筋直径和排布复核 a_s。本版本不自动选筋，也不以保护层直接代替 a_s。</p></div></div>
+    <fieldset class="scope-checks"><legend>计算选项与适用条件</legend>${scopeFields.map(([name, title]) => `<label><input name="${name}" type="checkbox" aria-describedby="${name}-error">${title}</label><p class="field-error" id="${name}-error"></p>`).join('')}</fieldset>
+    <p class="field-error" id="general-error" role="alert"></p><div class="form-actions"><button class="primary-button" type="submit">开始计算</button><button class="secondary-button" type="button" id="validate-button">检查输入</button><button class="secondary-button" type="button" id="view-results">结果查看 ↓</button></div><p class="calculation-lock">正截面受弯已实现；斜截面受剪、自动配筋尚未计算。</p></form></section>
+    <div class="results-column" id="results-area">
     <section class="panel" aria-labelledby="results-heading"><div class="panel-heading"><h2 id="results-heading">主要结果</h2><span id="calculation-state">尚未计算</span></div><div class="main-results"><div><span>受弯承载力 M_R</span><strong><span id="capacity-value">—</span> <small>kN·m</small></strong></div><div><span>验算结论</span><strong id="conclusion-value" class="result-text">尚未计算</strong></div></div><p id="input-status" class="input-status" aria-live="polite">填写参数并确认适用条件，再开始计算。</p><div id="geometry-result"></div><p id="input-summary" class="input-summary"></p></section>
     <section class="panel" aria-labelledby="checks-heading"><div class="panel-heading"><h2 id="checks-heading">规范验算</h2><span>实际值与限值逐项比较</span></div><div id="check-results"><p class="empty-note">计算后显示材料、截面、受压区、最小配筋与承载力判断。</p></div></section></div></div>
-    <section class="panel process-panel" aria-labelledby="process-heading"><div class="panel-heading"><h2 id="process-heading">详细计算过程</h2><span>公式 → 代入 → 结果 → 判断 → 原文</span></div><p class="precision-note">显示最多 8 位有效数字；计算保留高精度，临界判断不用显示舍入值或放宽容差。</p><div id="process-steps"><p class="empty-note">开始计算后生成本次参数对应的完整过程。</p></div></section>
+    <section class="panel process-panel" aria-labelledby="process-heading"><div class="panel-heading"><h2 id="process-heading">受弯验算计算书</h2><div class="report-actions"><button class="secondary-button" type="button" id="expand-report">展开全部</button><button class="secondary-button" type="button" id="collapse-report">折叠全部</button><button class="secondary-button" type="button" id="print-report" disabled>打印计算书</button></div></div><p class="precision-note">显示最多 8 位有效数字；计算保留高精度，临界判断不用显示舍入值或放宽容差。</p><div id="process-steps"><p class="empty-note">开始计算后生成本次参数对应的完整过程。</p></div></section>
     <section class="panel reference-panel" aria-labelledby="reference-heading"><div class="panel-heading"><h2 id="reference-heading">规范依据</h2><span>第二版方案已确认</span></div><div class="table-scroll"><table><thead><tr><th>计算步骤</th><th>规范 / 条文</th><th>适用说明</th><th>原文</th></tr></thead><tbody>${references.map(reference => `<tr><th scope="row">${reference.step}</th><td>${reference.standard}<small>${reference.clause}</small></td><td><span class="status-pass">方案已确认</span><small>${reference.note}</small></td><td><button class="text-button" type="button" data-reference="${reference.id}">查看规范原文</button>${reference.sourceUrl ? `<a href="${reference.sourceUrl}" target="_blank" rel="noopener noreferrer">发布来源 ↗</a>` : ''}</td></tr>`).join('')}</tbody></table></div></section>
     <footer>“满足”仅指本模块检查项目，不等于整根梁或工程全面合格。受剪、裂缝、挠度、锚固、耐久性与完整构造尚未验算。核心结果需经工程师人工验收。</footer></main>
     <dialog id="pdf-dialog" aria-labelledby="pdf-title"><div class="pdf-toolbar"><div><h2 id="pdf-title">规范原文</h2><p id="pdf-page-note"></p></div><button type="button" class="secondary-button" id="pdf-close">关闭</button></div><p id="pdf-status" class="pdf-fallback" aria-live="polite"></p><p class="pdf-fallback"><a id="pdf-source" target="_blank" rel="noopener noreferrer">官方发布来源</a> <a id="pdf-open" target="_blank" rel="noopener noreferrer">新窗口打开同一原页</a></p><iframe id="pdf-frame" title="规范 PDF 原文" referrerpolicy="no-referrer"></iframe></dialog>`;
@@ -59,6 +64,34 @@ export function mountBeamFlexure(app: HTMLElement): void {
   const process = get<HTMLDivElement>('#process-steps');
   const checkResults = get<HTMLDivElement>('#check-results');
   let hasResult = false;
+  const tabs = [get<HTMLButtonElement>('#design-tab'), get<HTMLButtonElement>('#reinforcement-tab')];
+  function selectTab(index: number, focus = false): void {
+    tabs.forEach((tab, i) => {
+      tab.setAttribute('aria-selected', String(i === index));
+      tab.tabIndex = i === index ? 0 : -1;
+      get<HTMLElement>(`#${tab.getAttribute('aria-controls')}`).hidden = i !== index;
+    });
+    if (focus) tabs[index].focus();
+  }
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectTab(index));
+    tab.addEventListener('keydown', event => {
+      if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      selectTab(event.key === 'Home' ? 0 : event.key === 'End' ? 1 : 1 - index, true);
+    });
+  });
+  get<HTMLButtonElement>('#view-results').addEventListener('click', () => get<HTMLElement>('#results-area').scrollIntoView({ block: 'start' }));
+  get<HTMLButtonElement>('#expand-report').addEventListener('click', () => process.querySelectorAll('details').forEach(item => { item.open = true; }));
+  get<HTMLButtonElement>('#collapse-report').addEventListener('click', () => process.querySelectorAll('details').forEach(item => { item.open = false; }));
+  let printState: boolean[] = [];
+  window.addEventListener('beforeprint', () => {
+    const items = [...process.querySelectorAll('details')];
+    printState = items.map(item => item.open);
+    items.forEach(item => { item.open = true; });
+  });
+  window.addEventListener('afterprint', () => process.querySelectorAll('details').forEach((item, index) => { item.open = printState[index] ?? false; }));
+  get<HTMLButtonElement>('#print-report').addEventListener('click', () => window.print());
   function readInput(): RawInput {
     const data = new FormData(form);
     const value = (key: string) => String(data.get(key) ?? '');
@@ -71,8 +104,12 @@ export function mountBeamFlexure(app: HTMLElement): void {
       get<HTMLElement>(`#${key}-error`).textContent = message;
       form.querySelector<HTMLElement>(`[name="${key}"]`)?.setAttribute('aria-invalid', 'true');
     }
+    const firstInvalid = form.querySelector<HTMLElement>('[aria-invalid="true"]');
+    const pane = firstInvalid?.closest<HTMLElement>('[role="tabpanel"]');
+    if (pane) selectTab(pane.id === 'design-info' ? 0 : 1);
   }
   function clearResults(): void {
+    get<HTMLButtonElement>('#print-report').disabled = true;
     geometry.replaceChildren();
     get<HTMLElement>('#capacity-value').textContent = '—';
     get<HTMLElement>('#conclusion-value').textContent = '尚未计算';
@@ -93,6 +130,7 @@ export function mountBeamFlexure(app: HTMLElement): void {
       return;
     }
     showErrors({});
+    get<HTMLButtonElement>('#print-report').disabled = false;
     const outside = result.status === 'outside-model';
     const passed = result.status === 'calculated' && result.passed;
     const conclusion = outside ? '超出当前模型' : passed ? '满足本模块检查项目' : '不满足';
@@ -110,6 +148,7 @@ export function mountBeamFlexure(app: HTMLElement): void {
   }
   function updateDiagram(): void {
     const raw = readInput();
+    get<HTMLElement>('#diagram-demand').textContent = Number.isFinite(Number(raw.M_d)) && Number(raw.M_d) > 0 ? `弯矩 M_d = ${formatNumber(Number(raw.M_d))} kN·m` : '弯矩 M_d：尚未输入';
     const label = (value: string, symbol: string) => Number.isFinite(Number(value)) && Number(value) > 0 ? `${symbol} = ${formatNumber(Number(value))}` : symbol;
     get<SVGTextElement>('#diagram-b').textContent = label(raw.b, 'b');
     get<SVGTextElement>('#diagram-h').textContent = label(raw.h, 'h');
